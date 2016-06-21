@@ -2,7 +2,7 @@ Allegro WebAPI PHP Client
 ==========================
 > The bridge between your app and [Allegro Group](https://en.wikipedia.org/wiki/Allegro_%28auction_website%29) servers
 
-[![Latest Version](https://img.shields.io/github/release/rindeal/allegro-client.svg?style=flat-square)](https://github.com/rindeal/allegro-php-client/releases/latest)
+[![Latest Version](https://img.shields.io/github/release/rindeal/allegro-php-client.svg?style=flat-square)](https://github.com/rindeal/allegro-php-client/releases/latest)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg?style=flat-square)](https://tldrlegal.com/license/gnu-general-public-license-v3-%28gpl-3%29)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/rindeal/allegro-php-client/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/rindeal/allegro-php-client/?branch=master)
 [![Codacy Code Quality](https://img.shields.io/codacy/7b16f96aa2494763b210bd07823210a2.svg?style=flat-square)](https://www.codacy.com/app/dev-rindeal/allegro-php-client)
