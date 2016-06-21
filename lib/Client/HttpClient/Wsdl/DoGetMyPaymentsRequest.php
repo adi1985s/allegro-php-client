@@ -41,6 +41,11 @@ class DoGetMyPaymentsRequest
     protected $pageNumber = null;
 
     /**
+     * @var int $strictedSearch
+     */
+    protected $strictedSearch = null;
+
+    /**
      * @param string $sessionId
      * @param int $sellerId
      * @param int $itemId
@@ -48,8 +53,9 @@ class DoGetMyPaymentsRequest
      * @param int $paymentTimeTo
      * @param int $pageSize
      * @param int $pageNumber
+     * @param int $strictedSearch
      */
-    public function __construct($sessionId = null, $sellerId = null, $itemId = null, $paymentTimeFrom = null, $paymentTimeTo = null, $pageSize = null, $pageNumber = null)
+    public function __construct($sessionId = null, $sellerId = null, $itemId = null, $paymentTimeFrom = null, $paymentTimeTo = null, $pageSize = null, $pageNumber = null, $strictedSearch = null)
     {
       $this->sessionId = $sessionId;
       $this->sellerId = $sellerId;
@@ -58,6 +64,7 @@ class DoGetMyPaymentsRequest
       $this->paymentTimeTo = $paymentTimeTo;
       $this->pageSize = $pageSize;
       $this->pageNumber = $pageNumber;
+      $this->strictedSearch = $strictedSearch;
     }
 
     /**
@@ -183,6 +190,24 @@ class DoGetMyPaymentsRequest
     public function setPageNumber($pageNumber)
     {
       $this->pageNumber = $pageNumber;
+      return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStrictedSearch()
+    {
+      return $this->strictedSearch;
+    }
+
+    /**
+     * @param int $strictedSearch
+     * @return \Rindeal\Allegro\Client\HttpClient\Wsdl\DoGetMyPaymentsRequest
+     */
+    public function setStrictedSearch($strictedSearch)
+    {
+      $this->strictedSearch = $strictedSearch;
       return $this;
     }
 

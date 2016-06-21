@@ -1,11 +1,12 @@
 <?php
 /**
- * HttpClient.php
+ * ClientParameters.php
  *
- * @author     Jan Chren (dev.rindeal AT outlook.com)
- * @copyright  Jan Chren (dev.rindeal AT outlook.com) (c) 2014
- * @license    For the full copyright and license information, please view the LICENSE
- *             file that was distributed with this source code.
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
+ * @copyright Copyright (c) 2014-2016, Jan Chren. All Rights Reserved.
+ * @license   Please view the LICENSE file
+ *            For the full copyright and license information, please view the LICENSE
+ *            file that was distributed with this source code.
  */
 
 namespace Rindeal\Allegro\Client;
@@ -14,6 +15,7 @@ namespace Rindeal\Allegro\Client;
 use Rindeal\Allegro\Client;
 use Rindeal\Allegro\Client\Exceptions\HttpClientException;
 use Rindeal\Allegro\Client\HttpClient\HttpClientParameters;
+use Rindeal\Allegro\Client\HttpClient\InjectionParameters;
 use Rindeal\Allegro\Client\HttpClient\SoapClient;
 use Rindeal\Allegro\Client\HttpClient\Wsdl\DoLoginEncRequest;
 use Rindeal\Allegro\Client\HttpClient\Wsdl\DoQueryAllSysStatusRequest;
@@ -35,7 +37,6 @@ class HttpClient
 
     /**
      * @var SoapClient downstream
-     * @internal
      */
     private $soapClient;
 
@@ -45,23 +46,27 @@ class HttpClient
     private $cache;
 
     /**
+     * @var InjectionParameters
+     */
+    public $injectionParameters;
+
+    /**
      * @param Client $client
      * @param HttpClientParameters $params
      *
      * @see  SoapClient::SoapClient()
      */
-    public function __construct(Client $client, HttpClientParameters $params = null)
-    {
+    public function __construct(Client $client, HttpClientParameters $params = null) {
         $this->client = $client;
-        if (is_null($params))
+        if (is_null($params)) {
             $params = new HttpClientParameters();
+        }
         $this->cache = $client->getCache();
-
         $session = $client->getSession();
 
-        if(empty($params->baseUrl)) {
+        if (empty($params->baseUrl)) {
             $base_urls = $client->inDevMode() ? HttpClientParameters::$DEV_BASE_URLS : HttpClientParameters::$BASE_URLS;
-            if(!isset($base_urls[$session->country->id])) {
+            if (!isset($base_urls[$session->country->id])) {
                 throw new \LogicException(
                     "I don't know baseUrl for country '$session->country', you have to supply one manually "
                     ."into HttpClientParameters object found in ClientParameters"
@@ -71,12 +76,18 @@ class HttpClient
             $params->baseUrl = $base_urls[$session->country->id];
         }
 
+        $this->injectionParameters = new InjectionParameters([
+            'webapiKey' => $session->credentials->webapiKey,
+            'countryId' => $session->country->id,
+            'countryCode' => $session->country->id, // yep, this is right
+        ]);
+
         // this may throw
         $soapClient = new SoapClient(
             [
                 'encoding' => 'UTF-8',
                 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-                'cache_wsdl' => WSDL_CACHE_DISK,
+                'cache_wsdl' => WSDL_CACHE_DISK, // TODO: make it optional? settable via HttpClientParameters?
                 'trace' => true, // enables __getLastResponse()/__getLastRequest() functions
                 'user_agent' => $params->userAgent,
                 'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
@@ -92,18 +103,22 @@ class HttpClient
     /**
      * @param string $login
      * @param string $hashedPassword
+     *
+     * @throws HttpClientException
      */
-    public function authenticate($login = '', $hashedPassword = '')
-    {
+    public function authenticate($login = '', $hashedPassword = '') {
         $session = $this->client->getSession();
         $credentials = $session->credentials;
         $cacheItem = $this->cache->getItem($session);
 
-        if(!empty($login))
+        if (!empty($login)) {
             $credentials->userLogin = $login;
-        if(!empty($hashedPassword))
+        }
+        if (!empty($hashedPassword)) {
             $credentials->hashedPassword = $hashedPassword;
+        }
 
+        // TODO: make it optionally cacheable
         if (!$cacheItem->isHit()) {
             $req = new DoLoginEncRequest();
             $req->setUserLogin($credentials->userLogin)
@@ -114,33 +129,33 @@ class HttpClient
 
             try {
                 $ret = $this->soapClient->doLoginEnc($req);
-            } catch(HttpClientException $e){
+            } catch (HttpClientException $e) {
                 echo($this->getLastRequest()."\n"); // DEBUG
                 throw $e;
             }
 
-            $cacheItem->set($ret, Period::SECONDS_PER_HOUR);
+            $cacheItem->set($ret)->expiresAfter(10 * Period::SECONDS_PER_MINUTE);
             $this->cache->save($cacheItem);
         } else {
             $ret = $cacheItem->get();
             // TODO: check if the $session->sessionId from cache is still valid, not because of time,
-            //  but because of the max number of concurrently active sessions
+            //  but because of the max number of concurrently active sessions (3)
         }
 
         $session->userId = $ret->getUserId();
         $session->sessionId = $ret->getSessionHandlePart();
 
-        $this->client->injectionParameters->setMulti([
+        $this->injectionParameters->setMulti([
             'sessionHandle' => $session->sessionId,
             'sessionId' => $session->sessionId,
+            // TODO userId?
         ]);
     }
 
     /**
      * @return SysStatusType
      */
-    public function getWebApiVersion()
-    {
+    public function getWebApiVersion() {
         /**
          * @var $apiVersion SysStatusType
          */
@@ -154,6 +169,7 @@ class HttpClient
                 $countryId = $session->country->id;
 
                 $req = new DoQueryAllSysStatusRequest();
+                // we cannot rely on injectionParameters as they might not be present at this moment
                 $req->setCountryId($countryId)
                     ->setWebapiKey($session->credentials->webapiKey);
 
@@ -166,7 +182,7 @@ class HttpClient
                     }
                 }
 
-                $cacheItem->set($apiVersion, Period::SECONDS_PER_DAY);
+                $cacheItem->set($apiVersion)->expiresAfter(Period::SECONDS_PER_DAY);
                 $this->cache->save($cacheItem);
             } else {
                 $apiVersion = $cacheItem->get();
@@ -179,37 +195,33 @@ class HttpClient
     /**
      * @return SoapClient
      */
-    public function getSoapClient()
-    {
+    public function getSoapClient() {
         return $this->soapClient;
     }
 
     /**
      * Get raw request dump
      *
-     * @details Useful for debugging purposes
+     * Useful for debugging
      *
      * @return string
      */
-    public function getLastRequest()
-    {
+    public function getLastRequest() {
         return $this->formatXml($this->soapClient->__getLastRequest());
     }
 
     /**
      * Get raw response dump
      *
-     * @details Useful for debugging purposes
+     * Useful for debugging
      *
      * @return string
      */
-    public function getLastResponse()
-    {
+    public function getLastResponse() {
         return $this->formatXml($this->soapClient->__getLastResponse());
     }
 
-    private function formatXml($xmlString)
-    {
+    private function formatXml($xmlString) {
         $simpleXml = new \SimpleXMLElement($xmlString);
         $dom = dom_import_simplexml($simpleXml)->ownerDocument;
         $dom->formatOutput = true;

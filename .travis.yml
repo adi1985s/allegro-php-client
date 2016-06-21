@@ -40,6 +40,7 @@ before_script:
   - composer update --no-interaction --prefer-source
 
 script:
-  - export ANSI_RED ANSI_GREEN ANSI_RESET
-  - export -f travis_wait travis_jigger
-  - ./gh-pages_deploy.sh
+  - :
+
+after_success:
+  - travis_wait 30 ./gh-pages_deploy.sh

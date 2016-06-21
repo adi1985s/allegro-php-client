@@ -2,7 +2,7 @@
 /**
  * Client.php
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
  * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
@@ -15,7 +15,6 @@ namespace Rindeal\Allegro;
 use Rindeal\Allegro\Client\ClientParameters;
 use Rindeal\Allegro\Client\Exceptions\HttpClientException;
 use Rindeal\Allegro\Client\HttpClient;
-use Rindeal\Allegro\Client\InjectionParameters;
 use Rindeal\Allegro\Client\Session;
 
 
@@ -26,13 +25,7 @@ class Client
 {
     const NAME = 'AllegroClient';
     const VERSION = '0.2.0';
-    const URL = 'https://github.com/rindeal/allegro-php-client';
-
-
-    /**
-     * @var InjectionParameters
-     */
-    public $injectionParameters;
+    const HOMEPAGE = 'https://github.com/rindeal/allegro-php-client';
 
 
     /**
@@ -55,19 +48,13 @@ class Client
      * @param Session $session
      * @param ClientParameters|null $params
      */
-    public function __construct(Session $session, ClientParameters $params = null)
-    {
+    public function __construct(Session $session, ClientParameters $params = null) {
         $this->session = $session;
 
         if (is_null($params)) {
             $params = new ClientParameters();
         }
         $this->params = $params;
-        $this->injectionParameters = new InjectionParameters([
-            'webapiKey' => $session->credentials->webapiKey,
-            'countryId' => $session->country->id,
-            'countryCode' => $session->country->id, // yep, this is right
-        ]);
 
         $this->httpClient = new HttpClient($this, $params->httpClientParams);
     }
@@ -75,58 +62,53 @@ class Client
     /**
      * @param string $login
      * @param string $hashedPassword
+     *
      * @throws HttpClientException
      * @throws \Exception
      */
-    public function authenticate($login = '', $hashedPassword = '')
-    {
+    public function authenticate($login = '', $hashedPassword = '') {
         $this->httpClient->authenticate($login, $hashedPassword);
     }
 
     /**
      * @return HttpClient\SoapClient
      */
-    public function call()
-    {
+    public function call() {
         return $this->httpClient->getSoapClient();
     }
 
     /**
      * @return HttpClient
      */
-    public function getHttpClient()
-    {
+    public function getHttpClient() {
         return $this->httpClient;
     }
 
     /**
      * @return Session
      */
-    public function getSession()
-    {
+    public function getSession() {
         return $this->session;
     }
 
     /**
      * @return \Psr\Cache\CacheItemPoolInterface
      */
-    public function getCache()
-    {
+    public function getCache() {
         return $this->params->cache;
     }
 
     /**
      * @return \Psr\Log\LoggerInterface
      */
-    public function getLogger()
-    {
+    public function getLogger() {
         return $this->params->logger;
     }
 
     /**
      * @return bool
      */
-    public function inDevMode(){
+    public function inDevMode() {
         return $this->params->inDevMode;
     }
 }

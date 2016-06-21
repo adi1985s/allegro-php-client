@@ -2,25 +2,17 @@
     "name": "rindeal/allegro-client",
     "description": "Allegro WebAPI PHP Client",
     "type": "library",
-    "license": [
-        "LGPL-3.0"
-    ],
+    "license": "LGPL-3.0",
     "authors": [
         {
             "name": "Jan Chren",
-            "email": "dev.rindeal+allegro-php-client@outlook.com"
+            "email": "dev.rindeal+allegro-php-client@gmail.com"
         }
     ],
 
     "minimum-stability": "stable",
     "prefer-stable": true,
 
-    "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/php-fig/cache.git"
-      }
-    ],
     "require": {
         "php": ">=5.4",
 
@@ -32,21 +24,21 @@
         "ext-mcrypt": "*",
         "ext-mbstring": "*",
 
-        "psr/log": "~1.0",
-        "psr/cache": "dev-master",
+        "psr/log": "1.0.*",
+        "psr/cache": "1.0.*",
 
-        "respect/validation": "~1.0",
-        "brandonwamboldt/utilphp": "~1.1"
+        "respect/validation": "1.1.*",
+        "brandonwamboldt/utilphp": "1.1.*"
     },
     "require-dev": {
-        "wsdl2phpgenerator/wsdl2phpgenerator": "~3.2",
+        "wsdl2phpgenerator/wsdl2phpgenerator": "3.3.*",
 
-        "phpunit/phpunit": "~4",
-        "monolog/monolog": "~1.17",
+        "phpunit/phpunit": "4.8.*",
+        "monolog/monolog": "1.19.*",
 
-        "squizlabs/php_codesniffer": "~2.3",
-        "phpmd/phpmd": "~2.2",
-        "fabpot/php-cs-fixer": "~1.10"
+        "squizlabs/php_codesniffer": "2.6.*",
+        "phpmd/phpmd": "2.4.*",
+        "friendsofphp/php-cs-fixer": "1.11.*"
     },
 
     "autoload": {

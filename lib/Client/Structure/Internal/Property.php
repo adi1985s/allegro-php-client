@@ -2,7 +2,7 @@
 /**
  * Property.php
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
  * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
@@ -43,18 +43,18 @@ class Property
      *      - setter - callable($newValue, $this)
      *      - lock - boolean - lock property immediately
      */
-    public function __construct(array $options = [])
-    {
+    public function __construct(array $options = []) {
         foreach (['validator', 'getter', 'setter'] as $callable) {
-            if(isset($options[$callable])){
-                if(!is_callable($options[$callable]))
+            if (isset($options[$callable])) {
+                if (!is_callable($options[$callable])) {
                     throw new \InvalidArgumentException("Option '$callable' is not callable");
+                }
 
                 $this->{$callable.'_'} = $options[$callable];
             }
         }
 
-        if (isset($options['default'])){
+        if (isset($options['default'])) {
             $this->set(
                 is_callable($options['default']) ?
                     call_user_func($options['default']) :
@@ -62,17 +62,18 @@ class Property
             );
         }
 
-        if(isset($options['lock']) && $options['lock'])
+        if (isset($options['lock']) && $options['lock']) {
             $this->lock();
+        }
     }
 
     /**
      * @param string $name
+     *
      * @return mixed
      */
-    public function get()
-    {
-        return isset($this->getter_)?call_user_func($this->getter_, $this):$this->value_;
+    public function get() {
+        return isset($this->getter_) ? call_user_func($this->getter_, $this) : $this->value_;
     }
 
     /**
@@ -80,24 +81,25 @@ class Property
      *
      * @return mixed
      */
-    public function forceGet(){
+    public function forceGet() {
         return $this->value_;
     }
 
     /**
      * @param string $name
      * @param mixed $value
+     *
      * @throws \BadMethodCallException
      * @throws \InvalidArgumentException
      */
-    public function set($value)
-    {
-        if ($this->isLocked())
+    public function set($value) {
+        if ($this->isLocked()) {
             throw new \LogicException('Property is locked');
+        }
 
         $this->validate($value);
 
-        if(isset($this->setter_) && is_callable($this->setter_)) {
+        if (isset($this->setter_) && is_callable($this->setter_)) {
             call_user_func($this->setter_, $value, $this);
         } else {
             $this->value_ = $value;
@@ -112,9 +114,10 @@ class Property
      * @warning Use carefully!
      *
      * @param $value
+     *
      * @return $this
      */
-    public function forceSet($value){
+    public function forceSet($value) {
         $this->value_ = $value;
 
         return $this;
@@ -126,8 +129,7 @@ class Property
      * @return $this
      * @throws \Exception
      */
-    public function validate()
-    {
+    public function validate() {
         $value = (func_num_args() > 0) ? func_get_arg(0) : $this->value_;
 
         if (isset($this->validator_)) {
@@ -137,27 +139,23 @@ class Property
         return $this;
     }
 
-    public function lock()
-    {
+    public function lock() {
         $this->locked_ = true;
 
         return $this;
     }
 
-    public function unlock()
-    {
+    public function unlock() {
         $this->locked_ = false;
 
         return $this;
     }
 
-    public function isLocked()
-    {
+    public function isLocked() {
         return $this->locked_;
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         return (string)$this->value_;
     }
 }

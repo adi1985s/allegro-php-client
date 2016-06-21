@@ -2,7 +2,7 @@
 /**
  * ApiCredentials.php
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
  * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
@@ -11,7 +11,7 @@
 
 namespace Rindeal\Allegro\Client;
 
-use Respect\Validation\Exceptions\NestedValidationExceptionInterface;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 use Rindeal\Allegro\Client\Structure\Internal\Property;
 use Rindeal\Allegro\Client\Structure\Internal\StructureBase;
@@ -36,13 +36,12 @@ class ApiCredentials extends StructureBase implements Stringable
      */
     protected $properties;
 
-    public function __construct($webapiKey = null, $userLogin = null, $hashedPassword = null)
-    {
+    public function __construct($webapiKey = null, $userLogin = null, $hashedPassword = null) {
         $this->properties['webapiKey'] = new Property([
             'validator' => function ($value) {
                 try {
-                    Validator::string()->noWhitespace()->notEmpty()->length(4)->assert($value);
-                } catch (NestedValidationExceptionInterface $e) {
+                    Validator::stringType()->noWhitespace()->notEmpty()->length(4)->assert($value);
+                } catch (NestedValidationException $e) {
                     throw new ValidationException($e);
                 }
             }
@@ -57,8 +56,8 @@ class ApiCredentials extends StructureBase implements Stringable
         $this->properties['userLogin'] = new Property([
             'validator' => function ($value) {
                 try {
-                    Validator::string()->noWhitespace()->notEmpty()->length(4)->assert($value);
-                } catch (NestedValidationExceptionInterface $e) {
+                    Validator::stringType()->noWhitespace()->notEmpty()->length(4)->assert($value);
+                } catch (NestedValidationException $e) {
                     throw new ValidationException($e);
                 }
             }
@@ -73,10 +72,11 @@ class ApiCredentials extends StructureBase implements Stringable
         $this->properties['hashedPassword'] = new Property([
             'validator' => function ($value) {
                 try {
-                    Validator::string()->noWhitespace()->notEmpty()->
-                    // http://stackoverflow.com/a/8571649/2566213
-                    regex('/^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{4}|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)$/')->assert($value);
-                } catch (NestedValidationExceptionInterface $e) {
+                    Validator::stringType()->noWhitespace()->notEmpty()
+                        // http://stackoverflow.com/a/8571649/2566213
+                        ->regex('/^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{4}|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)$/')
+                        ->assert($value);
+                } catch (NestedValidationException $e) {
                     throw new ValidationException($e);
                 }
             }
@@ -87,13 +87,11 @@ class ApiCredentials extends StructureBase implements Stringable
         }
     }
 
-    public static function hashPassword($password)
-    {
+    public static function hashPassword($password) {
         return base64_encode(hash('sha256', $password, true));
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         $ret = [];
 
         foreach (['webapiKey', 'userLogin', 'hashedPassword'] as $name) {

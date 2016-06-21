@@ -2,8 +2,8 @@
 /**
  * SoapClient.php
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
- * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
+ * @copyright Copyright (c) 2015-2016, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
  *            file that was distributed with this source code.
@@ -28,7 +28,7 @@ class SoapClient extends Wsdl\ServiceService
      */
     private $cacheTtl = -1;
 
-    public function __construct($options, $baseUrl, Client $client){
+    public function __construct($options, $baseUrl, Client $client) {
         parent::__construct($options, $baseUrl);
 
         $this->client = $client;
@@ -39,21 +39,20 @@ class SoapClient extends Wsdl\ServiceService
      * @see \SoapClient::__soapCall()
      * @throws HttpClientException
      */
-    public function __soapCall($functionName, $arguments, $options = null, $inputHeaders = null, &$outputHeaders = null)
-    {
+    public function __soapCall($functionName, $arguments, $options = null, $inputHeaders = null, &$outputHeaders = null) {
         // Inject parameters
         if (count($arguments) > 0 && is_object($arguments[0])) {
             // request should be one of the *Request classes from the Wsdl namespace
             $request = $arguments[0];
-            foreach ($this->client->injectionParameters as $name => $val) {
-                // following code is dependent on the naming convention of the WSDL2PHP generator
+            foreach ($this->client->getHttpClient()->injectionParameters as $name => $val) {
+                // WARNING: following code is dependent on the naming convention of the WSDL2PHP generator
                 $getterName = 'get'.ucfirst($name);
                 $setterName = 'set'.ucfirst($name);
 
-                if (property_exists($request, $name) &&
-                    method_exists($request, $getterName) &&
-                    is_null(call_user_func([$request, $getterName]) &&
-                    method_exists($request, $setterName))
+                if (property_exists($request, $name) && // check if exists
+                    method_exists($request, $getterName) && // check if is gettable
+                    is_null(call_user_func([$request, $getterName])) && // check if set
+                    method_exists($request, $setterName) // check if is settable
                 ) {
                     call_user_func([$request, $setterName], $val); // set def val
                 }
@@ -72,7 +71,7 @@ class SoapClient extends Wsdl\ServiceService
                     $ret = $item->get();
                 } else {
                     $ret = parent::__soapCall($functionName, $arguments, $options, $inputHeaders, $outputHeaders);
-                    $item->set($ret, $this->cacheTtl);
+                    $item->set($ret)->expiresAfter($this->cacheTtl);
                     $cache->save($item);
                 }
             } else {
@@ -87,18 +86,29 @@ class SoapClient extends Wsdl\ServiceService
         return $ret;
     }
 
-    public function cacheFor($seconds)
-    {
+    /**
+     * Call this method before calling the actual method in order to make use of caches
+     *
+     * @param int $seconds
+     *
+     * @return $this
+     */
+    public function cacheFor($seconds) {
         $this->cacheTtl = $seconds;
 
         return $this;
     }
 
-    private function isCacheable(){
-        return ($this->cacheTtl === -1);
+    /**
+     * Check if caller requested to cache this call
+     *
+     * @return bool
+     */
+    private function isCacheable() {
+        return ($this->cacheTtl !== -1);
     }
 
-    private function resetCacheableStatus(){
+    private function resetCacheableStatus() {
         $this->cacheTtl = -1;
     }
 

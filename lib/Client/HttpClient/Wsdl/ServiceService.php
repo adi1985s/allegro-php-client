@@ -446,8 +446,6 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
       'doGetWaitingFeedbacksResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doGetWaitingFeedbacksResponse',
       'DoGetWaitingFeedbacksCountRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoGetWaitingFeedbacksCountRequest',
       'doGetWaitingFeedbacksCountResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doGetWaitingFeedbacksCountResponse',
-      'DoInternalIStoreChangeRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoInternalIStoreChangeRequest',
-      'doInternalIStoreChangeResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doInternalIStoreChangeResponse',
       'DoLoginRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoLoginRequest',
       'doLoginResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doLoginResponse',
       'DoLoginEncRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoLoginEncRequest',
@@ -541,8 +539,6 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
       'DoShowUserRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoShowUserRequest',
       'ShowUserFeedbacks' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\ShowUserFeedbacks',
       'doShowUserResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doShowUserResponse',
-      'DoShowUserPageRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoShowUserPageRequest',
-      'doShowUserPageResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doShowUserPageResponse',
       'DoVerifyItemRequest' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\DoVerifyItemRequest',
       'doVerifyItemResponse' => 'Rindeal\\Allegro\\Client\\HttpClient\\Wsdl\\doVerifyItemResponse',
     );
@@ -551,7 +547,7 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
      * @param array $options A array of config values
      * @param string $wsdl The wsdl file to use
      */
-    public function __construct(array $options = array(), $wsdl = 'https://webapi.allegro.pl/service.php?wsdl')
+    public function __construct(array $options = array(), $wsdl = null)
     {
       foreach (self::$classmap as $key => $value) {
         if (!isset($options['classmap'][$key])) {
@@ -561,6 +557,9 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
       $options = array_merge(array (
       'features' => 1,
     ), $options);
+      if (!$wsdl) {
+        $wsdl = 'https://webapi.allegro.pl/service.php?wsdl';
+      }
       parent::__construct($wsdl, $options);
     }
 
@@ -1411,15 +1410,6 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
     }
 
     /**
-     * @param DoInternalIStoreChangeRequest $parameters
-     * @return doInternalIStoreChangeResponse
-     */
-    public function doInternalIStoreChange(DoInternalIStoreChangeRequest $parameters)
-    {
-      return $this->__soapCall('doInternalIStoreChange', array($parameters));
-    }
-
-    /**
      * @param DoLoginRequest $parameters
      * @return doLoginResponse
      */
@@ -1678,15 +1668,6 @@ class ServiceService extends \Rindeal\Allegro\Client\HttpClient\SoapClientBase
     public function doShowUser(DoShowUserRequest $parameters)
     {
       return $this->__soapCall('doShowUser', array($parameters));
-    }
-
-    /**
-     * @param DoShowUserPageRequest $parameters
-     * @return doShowUserPageResponse
-     */
-    public function doShowUserPage(DoShowUserPageRequest $parameters)
-    {
-      return $this->__soapCall('doShowUserPage', array($parameters));
     }
 
     /**

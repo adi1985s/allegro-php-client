@@ -41,6 +41,11 @@ class DoGetMyIncomingPaymentsRequest
     protected $transOffset = null;
 
     /**
+     * @var int $strictedSearch
+     */
+    protected $strictedSearch = null;
+
+    /**
      * @param string $sessionHandle
      * @param int $buyerId
      * @param int $itemId
@@ -48,8 +53,9 @@ class DoGetMyIncomingPaymentsRequest
      * @param int $transRecvDateTo
      * @param int $transPageLimit
      * @param int $transOffset
+     * @param int $strictedSearch
      */
-    public function __construct($sessionHandle = null, $buyerId = null, $itemId = null, $transRecvDateFrom = null, $transRecvDateTo = null, $transPageLimit = null, $transOffset = null)
+    public function __construct($sessionHandle = null, $buyerId = null, $itemId = null, $transRecvDateFrom = null, $transRecvDateTo = null, $transPageLimit = null, $transOffset = null, $strictedSearch = null)
     {
       $this->sessionHandle = $sessionHandle;
       $this->buyerId = $buyerId;
@@ -58,6 +64,7 @@ class DoGetMyIncomingPaymentsRequest
       $this->transRecvDateTo = $transRecvDateTo;
       $this->transPageLimit = $transPageLimit;
       $this->transOffset = $transOffset;
+      $this->strictedSearch = $strictedSearch;
     }
 
     /**
@@ -183,6 +190,24 @@ class DoGetMyIncomingPaymentsRequest
     public function setTransOffset($transOffset)
     {
       $this->transOffset = $transOffset;
+      return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStrictedSearch()
+    {
+      return $this->strictedSearch;
+    }
+
+    /**
+     * @param int $strictedSearch
+     * @return \Rindeal\Allegro\Client\HttpClient\Wsdl\DoGetMyIncomingPaymentsRequest
+     */
+    public function setStrictedSearch($strictedSearch)
+    {
+      $this->strictedSearch = $strictedSearch;
       return $this;
     }
 

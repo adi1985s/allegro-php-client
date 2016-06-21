@@ -2,8 +2,8 @@
 /**
  * HttpClientParameters.php
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
- * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
+ * @copyright Copyright (c) 2015-2016, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
  *            file that was distributed with this source code.
@@ -12,12 +12,12 @@
 namespace Rindeal\Allegro\Client\HttpClient;
 
 
-use Respect\Validation\Exceptions\NestedValidationExceptionInterface;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 use Rindeal\Allegro\Client;
 use Rindeal\Allegro\Client\Structure\Country;
-use Rindeal\Allegro\Client\Structure\Internal\StructureBase;
 use Rindeal\Allegro\Client\Structure\Internal\Property;
+use Rindeal\Allegro\Client\Structure\Internal\StructureBase;
 use Rindeal\Allegro\Client\Structure\Internal\ValidationException;
 use Rindeal\Allegro\Client\Structure\Stringable;
 
@@ -55,15 +55,14 @@ class HttpClientParameters extends StructureBase implements Stringable
         Country::ID_PL => 'https://webapi.allegro.pl.webapisandbox.pl/service.php?wsdl'
     ];
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->properties = [
             'userAgent' => new Property([
-                'default' => sprintf('%s/%s (+%s)', Client::NAME, Client::VERSION, Client::URL),
+                'default' => sprintf('%s/%s (+%s)', Client::NAME, Client::VERSION, Client::HOMEPAGE),
                 'validator' => function ($val) {
                     try {
-                        Validator::string()->length(6)->notEmpty()->assert($val);
-                    } catch (NestedValidationExceptionInterface $e) {
+                        Validator::stringType()->length(6)->notEmpty()->assert($val);
+                    } catch (NestedValidationException $e) {
                         throw new ValidationException($e);
                     }
                 }
@@ -72,8 +71,8 @@ class HttpClientParameters extends StructureBase implements Stringable
                 'default' => 10,
                 'validator' => function ($val) {
                     try {
-                        Validator::int()->min(2, true)->max(600)->assert($val);
-                    } catch (NestedValidationExceptionInterface $e) {
+                        Validator::intType()->min(2, true)->max(600)->assert($val);
+                    } catch (NestedValidationException $e) {
                         throw new ValidationException($e);
                     }
                 }
@@ -81,8 +80,8 @@ class HttpClientParameters extends StructureBase implements Stringable
             'baseUrl' => new Property([
                 'validator' => function ($val) {
                     try {
-                        Validator::string()->notEmpty()->assert($val);
-                    } catch (NestedValidationExceptionInterface $e) {
+                        Validator::stringType()->notEmpty()->assert($val);
+                    } catch (NestedValidationException $e) {
                         throw new ValidationException($e);
                     }
                 }
@@ -90,7 +89,7 @@ class HttpClientParameters extends StructureBase implements Stringable
         ];
     }
 
-    public function __toString(){
+    public function __toString() {
         return parent::toString();
     }
 

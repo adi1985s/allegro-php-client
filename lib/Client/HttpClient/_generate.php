@@ -3,7 +3,7 @@
 /**
  * Script to convert WSDL > PHP
  *
- * @author    Jan Chren <dev.rindeal AT outlook.com>
+ * @author    Jan Chren <dev.rindeal AT gmail.com>
  * @copyright Copyright (c) 2015, Jan Chren. All Rights Reserved.
  * @license   Please view the LICENSE file
  *            For the full copyright and license information, please view the LICENSE
@@ -18,8 +18,9 @@ define('OUTPUT_DIR', __DIR__.'/Wsdl');
 // old files MUST be deleted, before regenerating new ones
 $files = glob(OUTPUT_DIR.'/*');
 foreach ($files as $file) {
-    if(!is_dir($file))
+    if (!is_dir($file)) {
         unlink($file);
+    }
 }
 
 
